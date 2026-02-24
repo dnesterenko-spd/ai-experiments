@@ -1,0 +1,74 @@
+name: Claude PR Assistant
+
+on:
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude-assistant:
+    # Only run on comments that mention @claude
+    if: |
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber;
+            if (context.eventName === 'issue_comment') {
+              prNumber = context.issue.number;
+            } else if (context.eventName === 'pull_request_review_comment') {
+              prNumber = context.payload.pull_request.number;
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            core.setOutput('pr_number', prNumber);
+            core.setOutput('head_ref', pr.head.ref);
+            core.setOutput('head_sha', pr.head.sha);
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Claude Response
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only respond to mentions, don't auto-review
+          auto_review: false
+          respond_to_mentions: true
+
+          model: sonnet
+
+          instructions: |
+            You are a helpful AI assistant for code reviews and development questions.
+
+            When mentioned in a PR comment:
+            - Answer questions about the code changes
+            - Explain implementation details
+            - Suggest improvements or alternatives
+            - Help with debugging issues
+            - Review specific files or sections when asked
+
+            Be concise but thorough. Provide code examples when helpful.
+            If asked to review specific files, focus only on those files.
