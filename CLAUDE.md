@@ -11,19 +11,105 @@ This is a new/empty project directory. As the codebase develops, update this fil
 
 ## GitHub Workflows
 
-This repository includes automated PR review workflows:
+This repository has comprehensive automated PR review and quality checks.
 
-### Claude Code Action
-- **Automatic PR reviews**: Claude reviews all PRs automatically
-- **Interactive assistance**: Mention `@claude` in PR comments to ask questions
-- **Setup required**: Add `ANTHROPIC_API_KEY` to repository secrets
-- See `.github/CLAUDE_SETUP.md` for complete setup instructions
+### 🤖 Claude Code Action (AI-Powered Reviews)
 
-### PR Review Checks
-- PR title validation (conventional commits)
-- Large file detection
-- Secret scanning
-- Auto-labeling based on changed files
-- PR size checking
+**Files:**
+- `.github/workflows/claude-code-review.yml` - Automatic PR reviews
+- `.github/workflows/claude-pr-assistant.yml` - Interactive @claude mentions
+- `.github/claude-code.yml` - Claude configuration
+- `.github/CLAUDE_SETUP.md` - Complete setup guide
+
+**Features:**
+- **Automatic PR Reviews**: Claude analyzes PRs for code quality, security, performance, and best practices
+- **Interactive Assistant**: Mention `@claude` in PR comments to:
+  - Review specific files: `@claude review src/auth.js`
+  - Explain code: `@claude explain this function`
+  - Get suggestions: `@claude suggest a better approach`
+  - Security focus: `@claude security review`
+  - Performance focus: `@claude performance review`
+
+**Setup Required:**
+1. Add `ANTHROPIC_API_KEY` to repository secrets
+2. Go to: Settings → Secrets and variables → Actions
+3. See `.github/CLAUDE_SETUP.md` for detailed instructions
+
+**Configuration:**
+- Review level: `focused` (quick/focused/full)
+- Model: `sonnet` (haiku/sonnet/opus)
+- Excludes: lock files, generated files, dist/build folders
+- Focus areas: code quality, security, performance, tests, documentation
+
+### ✅ Standard PR Review Checks
+
+**File:** `.github/workflows/pr-review.yml`
+
+**Checks:**
+- **PR Title Validation**: Enforces conventional commit format
+  - Format: `type(scope): description`
+  - Examples: `feat(auth): add login`, `fix(api): resolve timeout`
+- **Large File Detection**: Warns about files >5MB
+- **Secret Scanning**: Basic pattern matching for API keys, passwords, tokens
+- **Tech Stack Support**: Templates for Node.js, Python, Go, Rust (commented, customize as needed)
+
+**Customization:**
+Uncomment and configure sections for your tech stack in the workflow file.
+
+### 📏 PR Size Checker
+
+**File:** `.github/workflows/pr-size-checker.yml`
+
+**Features:**
+- Analyzes total lines changed (additions + deletions)
+- Size categories: XS (<50), S (<200), M (<500), L (<1000), XL (>1000)
+- Automatically comments on large PRs (>500 lines) with suggestions to split
+- Visual indicators: 🟢 Small, 🟡 Medium, 🟠 Large, 🔴 Very Large
+
+### 🏷️ Auto-Labeling
+
+**Files:**
+- `.github/labeler.yml` - Label configuration
+
+**Auto-applied Labels:**
+- `documentation` - Changes to `.md` files or `docs/` folder
+- `dependencies` - Updates to package.json, requirements.txt, Cargo.toml, go.mod
+- `ci/cd` - Changes to `.github/` workflows
+- `configuration` - Changes to config files (yml, yaml, json, toml)
+
+**Customization:**
+Add project-specific labels in `labeler.yml` for frontend, backend, tests, etc.
+
+## Workflow Triggers
+
+All workflows trigger on:
+- Pull requests targeting `main` branch
+- PR events: opened, synchronize (new commits), reopened
+- Comments: @claude mentions
+
+## Development Workflow
+
+1. **Create a branch** from `main`
+2. **Make changes** and commit
+3. **Open a PR** → Workflows run automatically:
+   - Claude reviews your code
+   - PR checks validate title, scan for secrets, check file sizes
+   - PR size is analyzed
+   - Labels are auto-applied
+4. **Interact with Claude** by mentioning `@claude` in comments
+5. **Address feedback** and push changes
+6. **Merge** when approved and checks pass
+
+## Commit Message Convention
+
+Follow conventional commits format for PR titles:
+- `feat(scope): description` - New feature
+- `fix(scope): description` - Bug fix
+- `docs(scope): description` - Documentation
+- `style(scope): description` - Formatting, no code change
+- `refactor(scope): description` - Code restructuring
+- `test(scope): description` - Adding/updating tests
+- `chore(scope): description` - Maintenance tasks
+- `perf(scope): description` - Performance improvements
 
 ## Additional details
