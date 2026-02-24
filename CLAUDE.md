@@ -18,8 +18,10 @@ This repository has comprehensive automated PR review and quality checks.
 **Files:**
 - `.github/workflows/claude-code-review.yml` - Automatic PR reviews
 - `.github/workflows/claude-pr-assistant.yml` - Interactive @claude mentions
-- `.github/claude-code.yml` - Claude configuration
 - `.github/CLAUDE_SETUP.md` - Complete setup guide
+- `CLAUDE.md` - Project-level instructions for Claude (this file)
+
+**Note:** Configuration is done through workflow files and this CLAUDE.md file. The v1.0 action does not use a separate `.github/claude-code.yml` configuration file.
 
 **Features:**
 - **Automatic PR Reviews**: Claude analyzes PRs for code quality, security, performance, and best practices
@@ -36,10 +38,12 @@ This repository has comprehensive automated PR review and quality checks.
 3. See `.github/CLAUDE_SETUP.md` for detailed instructions
 
 **Configuration:**
-- Review level: `focused` (quick/focused/full)
-- Model: `sonnet` (haiku/sonnet/opus)
-- Excludes: lock files, generated files, dist/build folders
+- Model: `claude-sonnet-4-6` (configured via `claude_args: --model`)
+- Max turns: 10 for automatic reviews, 15 for interactive mentions
+- Excludes: lock files, minified files, generated files, dist/build folders, dependencies
 - Focus areas: code quality, security, performance, tests, documentation
+- Fix links: Enabled (clickable "Fix this" links in review comments)
+- Branch prefix: `claude/` for automated fix branches
 
 ### ✅ Standard PR Review Checks
 
