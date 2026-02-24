@@ -1,0 +1,76 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude-review:
+    # Only run on PRs or PR comments
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request) ||
+      github.event_name == 'pull_request_review_comment'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # For PR comments, checkout the PR branch
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.pull_request.head.ref }}
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Required: Your Anthropic API key
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # Required: GitHub token for PR interactions
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Automatic review on PR open/update
+          auto_review: true
+
+          # Respond to @claude mentions in comments
+          respond_to_mentions: true
+
+          # Model to use (opus, sonnet, or haiku)
+          model: sonnet
+
+          # Custom instructions for Claude (optional)
+          instructions: |
+            You are reviewing code in a pull request. Focus on:
+            - Code quality and best practices
+            - Potential bugs or security issues
+            - Performance concerns
+            - Maintainability and readability
+            - Test coverage
+
+            Be constructive and helpful. Suggest improvements with code examples.
+            For minor issues, use suggestions. For major issues, request changes.
+
+          # Files to exclude from review (optional)
+          exclude_patterns: |
+            *.md
+            *.lock
+            *.min.js
+            dist/**
+            build/**
+            node_modules/**
+
+          # Maximum files to review (optional, default: 50)
+          max_files: 50
+
+          # Review level: 'full', 'focused', or 'quick' (optional, default: 'focused')
+          review_level: focused

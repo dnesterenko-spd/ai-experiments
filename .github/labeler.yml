@@ -1,0 +1,40 @@
+# Auto-labeling configuration for PRs
+# Customize these rules based on your project structure
+
+documentation:
+  - '**/*.md'
+  - 'docs/**/*'
+
+dependencies:
+  - 'package.json'
+  - 'package-lock.json'
+  - 'requirements.txt'
+  - 'Cargo.toml'
+  - 'Cargo.lock'
+  - 'go.mod'
+  - 'go.sum'
+
+ci/cd:
+  - '.github/**/*'
+
+configuration:
+  - '**/*.yml'
+  - '**/*.yaml'
+  - '**/*.json'
+  - '**/*.toml'
+  - '.env.*'
+  - 'config/**/*'
+
+# Add more labels based on your project structure:
+# frontend:
+#   - 'src/components/**/*'
+#   - 'src/pages/**/*'
+#
+# backend:
+#   - 'src/api/**/*'
+#   - 'src/services/**/*'
+#
+# tests:
+#   - '**/*.test.*'
+#   - '**/*.spec.*'
+#   - 'tests/**/*'
